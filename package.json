@@ -4,13 +4,12 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "next dev --turbopack",
+		"prepare": "panda codegen && lefthook install",
+		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "biome lint .",
-		"format": "biome format --write .",
-		"check": "biome check --write .",
-		"prepare": "panda codegen"
+		"lint": "biome check .",
+		"format": "biome format ."
 	},
 	"keywords": [],
 	"author": "",
@@ -29,6 +28,7 @@
 		"@types/node": "^25.5.2",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
+		"lefthook": "^2.1.5",
 		"typescript": "^6.0.2"
 	}
 }

@@ -1,23 +1,23 @@
 ---
 name: check-health
-description: プロジェクトのヘルスチェック（型チェック、lint、ビルド）を実行する
+description: Run all project health checks (types, lint, build)
 ---
 
 # Check Health
 
-以下のチェックを順番に実行し、最初の失敗で停止する:
+Run these checks in sequence, stopping on first failure:
 
-1. `npx tsc --noEmit` — TypeScript型チェック
-2. `pnpm lint` — Biome lint + フォーマットチェック
-3. `pnpm build` — プロダクションビルド
+1. `npx tsc --noEmit` — TypeScript type check
+2. `pnpm lint` — Biome lint + format check
+3. `pnpm build` — Production build
 
-## 結果報告フォーマット
+## Report Format
 
 ```
-- [x] TypeScript: pass (エラー数)
-- [x] Biome: pass (エラー数)
+- [x] TypeScript: pass (error count)
+- [x] Biome: pass (error count)
 - [x] Build: pass
 ```
 
-すべて通過した場合はプロジェクトが健全であることを確認。
-失敗した場合は具体的なエラーと修正案を提示する。
+If all pass, confirm the project is healthy.
+If any fail, provide specific errors and suggested fixes.

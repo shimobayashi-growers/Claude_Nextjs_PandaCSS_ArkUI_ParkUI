@@ -1,22 +1,22 @@
 ---
-description: ファイル名・コード命名規則
+description: File and code naming conventions
 globs: ["src/**/*"]
 ---
 
-# 命名規則
+# Naming Conventions
 
-## ファイル名
-- すべてkebab-case: `button-showcase.tsx`, `hero-section.tsx`
-- サフィックスパターン: `-anatomy.ts`, `-recipe.ts`, `.tsx`（コンポーネント）, `.test.tsx`
-- ページ固有フォルダ: `_` プレフィックス（`_components/`, `_sections/`）
+## Files
+- All kebab-case: `button-showcase.tsx`, `hero-section.tsx`
+- Suffix patterns: `-anatomy.ts`, `-recipe.ts`, `.tsx` (component), `.test.tsx`
+- Page-private folders: `_` prefix (`_components/`, `_sections/`)
 
-## コード
-- PascalCase: コンポーネント、型（`Button`, `ButtonProps`, `ButtonVariantProps`）
-- camelCase: 関数、変数、recipeインスタンス（`buttonRecipe`, `buttonAnatomy`）
-- UPPER_SNAKE_CASE: 真の定数のみ（環境キー、マジックナンバー）
+## Code
+- PascalCase: components, types (`Button`, `ButtonProps`, `ButtonVariantProps`)
+- camelCase: functions, variables, recipe instances (`buttonRecipe`, `buttonAnatomy`)
+- UPPER_SNAKE_CASE: true constants only (env keys, magic numbers)
 
-## エクスポート
-- すべてnamed export。default exportはNext.jsのpage/layoutのみ（フレームワーク要件）
-- 各コンポーネントフォルダにbarrel `index.ts` — ファイルではなくフォルダからインポート
-- 共有UIは `@/components/ui/arc/button` のようにエイリアスでインポート
-- styled-systemは相対パスでインポート（`src/` 外にあるため）
+## Exports
+- Named exports everywhere. Default exports ONLY for Next.js pages/layouts (framework requirement)
+- Barrel `index.ts` in each component folder — import from folder, not file
+- Import shared UI via alias: `@/components/ui/arc/button`
+- Import styled-system via relative paths (it's outside `src/`)

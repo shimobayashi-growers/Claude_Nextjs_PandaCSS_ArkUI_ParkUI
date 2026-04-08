@@ -1,42 +1,42 @@
 ---
 name: sync-config
-description: Claude Code設定ファイルの鮮度チェックと更新提案を行う
+description: Audit Claude Code config files for freshness and propose updates
 ---
 
 # Sync Config
 
-全設定ファイルの包括的な整合性チェックを実行し、更新が必要な箇所を提案する。
+Run a comprehensive consistency check across all config files and propose updates.
 
-## チェック項目
+## Checks
 
-### 1. CLAUDE.md 鮮度チェック
-- `git log --oneline -20` で最近のコミットを確認
-- 新しい設計判断や教訓がCLAUDE.mdに反映されていないか検出
-- 更新が必要な場合はdiffで提案
+### 1. CLAUDE.md Freshness
+- Review `git log --oneline -20` for recent commits
+- Detect new design decisions or lessons not yet reflected in CLAUDE.md
+- Propose updates as diffs if needed
 
-### 2. rules/ 整合性チェック
-- `src/components/ui/arc/` 配下の全コンポーネントをスキャン
-- 現在のコードパターンと rules/ の記述の乖離を検出
-- 新しいパターン（例: multi-slot `sva()` の導入）があれば追記提案
-- globs設定が現在のディレクトリ構造と合っているか確認
+### 2. rules/ Consistency
+- Scan all components in `src/components/ui/arc/`
+- Detect drift between current code patterns and rules/ documentation
+- Propose additions for new patterns (e.g., multi-slot `sva()` introduction)
+- Verify globs match current directory structure
 
-### 3. settings.json 権限チェック
-- `package.json` の scripts と照合し、未許可の新スクリプトを検出
-- 新しい devDependencies のCLIツールがあれば allow 追加を提案
-- deny リストが最新のセキュリティ要件を満たしているか確認
+### 3. settings.json Permissions
+- Cross-reference `package.json` scripts for unpermitted new scripts
+- Propose allow additions for new devDependency CLI tools
+- Verify deny list meets current security requirements
 
-### 4. skills/ カバレッジチェック
-- 頻出するワークフローでスキル化されていないものを提案
-- 既存スキルが現在のファイル構造と整合しているか確認
-- 新しいコンポーネントやページ構造パターンの反映
+### 4. skills/ Coverage
+- Identify frequent workflows not yet captured as skills
+- Verify existing skills align with current file structure
+- Reflect new component or page structure patterns
 
-### 5. hooks/ 動作確認
-- `session-start-check.sh` と `pre-commit-sync-check.sh` が現在のプロジェクト構造で正しく動作するか確認
-- 必要に応じてスクリプトの更新を提案
+### 5. hooks/ Verification
+- Confirm `session-start-check.sh` and `pre-commit-sync-check.sh` work with current project structure
+- Propose script updates if needed
 
-## 出力フォーマット
+## Output Format
 
-各チェック項目について:
-- **OK**: 問題なし
-- **UPDATE NEEDED**: 具体的な変更提案をdiff形式で提示
-- **NEW**: 新規追加が必要な項目
+Per check item:
+- **OK**: No issues
+- **UPDATE NEEDED**: Specific change proposal in diff format
+- **NEW**: New addition required

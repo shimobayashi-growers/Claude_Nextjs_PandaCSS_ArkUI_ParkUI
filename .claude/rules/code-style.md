@@ -1,24 +1,24 @@
 ---
-description: PandaCSS、ArkUI、ParkUIのコーディング規約
+description: PandaCSS, ArkUI, and ParkUI coding conventions
 globs: ["src/**/*.{ts,tsx}"]
 ---
 
-# コードスタイルルール
+# Code Style Rules
 
 ## PandaCSS
-- 必ずPandaCSSトークンを `css()` またはrecipe経由で使用する。`style={{}}` や生のCSS値は禁止
-- `css` は `styled-system/css` からの相対パスインポート。パッケージからのインポートではない
-- レイアウトにはPandaCSSパターン（stack, hstack, vstack, flex, grid）を適宜使用する
-- トークン値は文字列: `css({ p: "4", gap: "3" })` — 数値 `css({ p: 4 })` ではない
-- `globals.css` 以外の `.css` / `.module.css` ファイルを作成しない
+- ALWAYS use PandaCSS tokens via `css()` or recipes. NEVER use `style={{}}` or raw CSS values
+- Import `css` from relative path to `styled-system/css`, not from a package
+- Use PandaCSS patterns (stack, hstack, vstack, flex, grid) for layout where appropriate
+- Token values are strings: `css({ p: "4", gap: "3" })` — not numbers `css({ p: 4 })`
+- Do not create `.css` or `.module.css` files except `globals.css`
 
 ## Biome
-- インデントはタブ（biome.jsonで設定済み）
-- 文字列はダブルクォート（biome.jsonで設定済み）
-- eslint、prettier、その他のフォーマッタ設定を追加しない
-- チェック: `pnpm lint` / 自動修正: `pnpm format`
+- Indent with tabs (configured in biome.json)
+- Double quotes for strings (configured in biome.json)
+- Do not add eslint, prettier, or any other formatter config
+- Check: `pnpm lint` / Auto-fix: `pnpm format`
 
 ## TypeScript
-- strictモード有効。`any` は禁止 — `unknown` を使って型を絞り込む
-- propsには `interface` より `type` を優先（プロジェクト規約）
-- 型のみのインポートは `import type { X } from "y"` を使用
+- Strict mode enabled. Never use `any` — use `unknown` and narrow
+- Prefer `type` over `interface` for props (project convention)
+- Use type-only imports: `import type { X } from "y"`

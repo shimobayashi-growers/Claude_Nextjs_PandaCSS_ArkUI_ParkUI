@@ -1,18 +1,18 @@
 ---
-description: テスト規約（テストフレームワーク追加時に拡張）
+description: Testing conventions (expand when test framework is added)
 globs: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"]
 ---
 
-# テストルール
+# Testing Rules
 
-## 現状
-テストフレームワーク未導入。テスト追加時の方針:
-- Vitest を使用（PandaCSSビルドパイプラインと互換性あり）
-- テストファイルはソースと同階層に配置: `button.test.tsx` を `button.tsx` の隣に
-- コンポーネントテストには React Testing Library を使用
-- ビジュアルスタイリングではなく振る舞い（クリック、キーボード操作）をテスト
+## Current State
+No test framework installed yet. When adding tests:
+- Use Vitest (compatible with PandaCSS build pipeline)
+- Co-locate test files next to source: `button.test.tsx` alongside `button.tsx`
+- Use React Testing Library for component tests
+- Test behavior (click, keyboard nav) not visual styling
 
-## 命名規則
-- ファイル: `{component-name}.test.tsx`
-- describeブロック: コンポーネントの表示名
-- テスト名: 「should {期待される振る舞い} when {条件}」
+## Naming
+- File: `{component-name}.test.tsx`
+- Describe block: component display name
+- Test names: "should {expected behavior} when {condition}"

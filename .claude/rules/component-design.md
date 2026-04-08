@@ -1,30 +1,30 @@
 ---
-description: ArkUI anatomyパターンによるUIコンポーネント設計ルール
+description: UI component design rules using ArkUI anatomy pattern
 globs: ["src/components/ui/arc/**/*.{ts,tsx}"]
 ---
 
-# コンポーネント設計ルール
+# Component Design Rules
 
-## ファイル構成（必須4ファイルパターン）
-`src/components/ui/arc/` 配下のすべてのコンポーネントは以下を持つこと:
+## File Structure (mandatory 4-file pattern)
+Every component in `src/components/ui/arc/` MUST have:
 
-1. `{name}-anatomy.ts` — `createAnatomy("{name}").parts(...)` でslot定義
-2. `{name}-recipe.ts` — `styled-system/recipes` からrecipeをre-export + 型エイリアス
-3. `{name}.tsx` — forwardRefを使ったコンポーネント実装、recipeでclassName適用
-4. `index.ts` — barrel exports（コンポーネント、props型、anatomy、recipe、variant props）
+1. `{name}-anatomy.ts` — `createAnatomy("{name}").parts(...)` slot definitions
+2. `{name}-recipe.ts` — Re-export recipe from `styled-system/recipes` + type alias
+3. `{name}.tsx` — Component with forwardRef, recipe applied via className
+4. `index.ts` — Barrel exports (component, props type, anatomy, recipe, variant props)
 
-## 実装ルール
-- すべてのコンポーネントで `forwardRef` を使用（Ark UIのref合成に必須）
-- recipe型からバリアントpropsを抽出し、HTML要素の属性とマージしてprops型を定義
-- recipeの呼び出しはコンポーネントのトップで1回のみ、結果を `className` で適用
-- コンポーネントファイル内で `css()` を呼ばない — スタイリングはすべてrecipeバリアント経由
-- マルチスロットコンポーネントには単一recipeではなく `sva()`（slot variant API）を使用
+## Implementation Rules
+- Use `forwardRef` on all components (required for Ark UI ref composition)
+- Extract variant props from recipe type, merge with HTML element attributes for props type
+- Call recipe function ONCE at component top, apply result via `className`
+- NO `css()` calls inside component files — all styling through recipe variants
+- Use `sva()` (slot variant API) for multi-slot components instead of single recipe
 
-## 新コンポーネント追加手順
-1. recipeの存在確認: `ls styled-system/recipes/{name}.*`
-2. なければ panda.config.ts にrecipeが含まれていることを確認し `pnpm prepare` で再生成
-3. 上記の4ファイル構成を作成
-4. Park UIプリセットで利用可能なrecipe: accordion, alert, avatar, badge, button, card,
+## Adding a New Component
+1. Check if recipe exists: `ls styled-system/recipes/{name}.*`
+2. If not, ensure panda.config.ts includes it and run `pnpm prepare` to regenerate
+3. Create the 4-file structure above
+4. Available Park UI preset recipes: accordion, alert, avatar, badge, button, card,
    carousel, checkbox, clipboard, code, collapsible, color-picker, combobox, date-picker,
    dialog, drawer, editable, field, fieldset, file-upload, form-label, hover-card, icon,
    input, kbd, link, menu, number-input, pagination, pin-input, popover, progress, qr-code,

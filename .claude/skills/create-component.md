@@ -1,27 +1,27 @@
 ---
 name: create-component
-description: ArkUI anatomyパターンに従ったUIコンポーネントの雛形を生成する
+description: Scaffold a new UI component following the ArkUI anatomy pattern
 ---
 
 # Create Component
 
-`/create-component {name}` で新しいUIコンポーネントを作成する。
+`/create-component {name}` scaffolds a new UI component.
 
-## 手順
+## Steps
 
-1. **recipeの存在確認**
-   - `ls styled-system/recipes/{name}.*` で確認
-   - なければ `pnpm prepare` を実行して再チェック
-   - それでもなければ Park UI プリセットにこのrecipeが含まれていないことをユーザーに通知
+1. **Verify recipe exists**
+   - Check `ls styled-system/recipes/{name}.*`
+   - If missing, run `pnpm prepare` and re-check
+   - If still missing, inform user the Park UI preset does not include this recipe
 
-2. **4ファイル構成を `src/components/ui/arc/{name}/` に作成**
+2. **Create 4-file structure in `src/components/ui/arc/{name}/`**
 
    **`{name}-anatomy.ts`:**
    ```typescript
    import { createAnatomy } from "@ark-ui/react/anatomy";
    export const {name}Anatomy = createAnatomy("{name}").parts("root");
    ```
-   ※ Ark UIドキュメントで実際のanatomyパーツを確認すること
+   Note: check Ark UI docs for the component's actual anatomy parts.
 
    **`{name}-recipe.ts`:**
    ```typescript
@@ -53,6 +53,6 @@ description: ArkUI anatomyパターンに従ったUIコンポーネントの雛�
    export { type {Name}VariantProps, {name}Recipe } from "./{name}-recipe";
    ```
 
-3. **`pnpm lint` で検証**
+3. **Run `pnpm lint` to verify**
 
-4. **作成結果を報告**
+4. **Report what was created**

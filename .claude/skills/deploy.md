@@ -1,19 +1,19 @@
 ---
 name: deploy
-description: Vercelへのデプロイ（プレビューまたはプロダクション）
+description: Deploy to Vercel (preview or production)
 disable-model-invocation: true
 ---
 
 # Deploy
 
-このスキルは安全のためAIによる自律実行を無効化している。
+Model auto-invocation disabled for safety.
 
-## 手順
+## Steps
 
-1. `pnpm build` でビルドが成功することを確認
-2. ビルド失敗時は **停止** してエラーを報告
-3. 引数が "prod" または "production" の場合:
-   - `vercel --prod` を実行
-4. それ以外:
-   - `vercel` を実行（プレビューデプロイ）
-5. デプロイURLを報告
+1. Run `pnpm build` to verify build succeeds
+2. If build fails, **STOP** and report errors
+3. If argument is "prod" or "production":
+   - Run `vercel --prod`
+4. Otherwise:
+   - Run `vercel` (preview deployment)
+5. Report the deployment URL

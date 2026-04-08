@@ -1,15 +1,15 @@
 ---
 name: add-page
-description: ルートグループ構造を持つ新しいページの雛形を生成する
+description: Scaffold a new page with route group, sections, and components folders
 ---
 
 # Add Page
 
-`/add-page {route-name}` で新しいページを作成する。
+`/add-page {route-name}` scaffolds a new page.
 
-## 手順
+## Steps
 
-1. **ルートグループ構造を作成:**
+1. **Create route group structure:**
    ```
    src/app/({route-name})/
    ├── page.tsx
@@ -17,19 +17,19 @@ description: ルートグループ構造を持つ新しいページの雛形を�
    └── _components/
    ```
 
-2. **`page.tsx`** はServer Component（`"use client"` なし）として作成。セクションを合成する構造:
+2. **`page.tsx`** must be a Server Component (no `"use client"`), composing sections:
    ```typescript
    import { css } from "../../../../styled-system/css";
 
    export default function {RouteName}Page() {
      return (
        <main className={css({ maxW: "breakpoint-xl", mx: "auto", p: "6" })}>
-         {/* sections をここに配置 */}
+         {/* sections go here */}
        </main>
      );
    }
    ```
 
-3. ユーザーがセクションを指定した場合、`_sections/` に `hero-section.tsx` パターンに従って作成（named export、`css()` でレイアウト）
+3. If user specifies sections, create them in `_sections/` following the `hero-section.tsx` pattern (named export, `css()` for layout)
 
-4. **`pnpm lint` で検証**
+4. **Run `pnpm lint` to verify**

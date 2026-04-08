@@ -1,41 +1,46 @@
 # CLAUDE.md
 
-## 設計意図
+## Design Intent
 
-このプロジェクトは「headless + recipe + preset」の3層アプローチでUIを構築する:
-- **Ark UI** — ヘッドレスな振る舞い（アクセシビリティ、キーボード操作、状態管理）を提供
-- **PandaCSS recipes** — 型安全なバリアントマップとしてビジュアルスタイリングを定義
-- **Park UI preset** — デフォルトのrecipe実装を供給
+This project builds UI with a "headless + recipe + preset" three-layer approach:
+- **Ark UI** — Headless behavior (accessibility, keyboard navigation, state management)
+- **PandaCSS recipes** — Visual styling as type-safe variant maps
+- **Park UI preset** — Default recipe implementations
 
-Park UIのrecipeを直接使わず `src/components/ui/arc/` でラップしている理由:
-プロジェクト固有のバリアントオーバーライドやanatomy拡張を、生成コードを変更せずに行うための継ぎ目が必要。`styled-system/` は生成出力であり、手動編集は禁止。
+Park UI recipes are wrapped in `src/components/ui/arc/` rather than used directly.
+This provides a seam for project-specific variant overrides and anatomy extensions
+without modifying generated code. `styled-system/` is generated output — never hand-edit.
 
-## 重要な設計判断
+## Key Design Decisions
 
-### なぜ PandaCSS か
-ビルド時の型安全トークン強制が目的。`css()` ユーティリティとrecipeシステムにより任意の値を防ぎ、デザインの一貫性を保証する。トレードオフとして、トークンやrecipe設定の変更後は `pnpm prepare` による再生成が必須。
+### Why PandaCSS
+Build-time type-safe token enforcement. The `css()` utility and recipe system prevent
+arbitrary values, ensuring design consistency. Trade-off: `pnpm prepare` must be run
+after any token or recipe config change.
 
-### なぜ forwardRef が必須か
-すべてのUIコンポーネントは `forwardRef` を使用する。Ark UIのヘッドレスコンポーネントはrefベースの合成パターン（フォーカス制御、寸法計測、ポータルアンカリング）を使用しており、`forwardRef` を削除するとArk UI統合が壊れる。
+### Why forwardRef Is Required
+All UI components use `forwardRef`. Ark UI headless components use ref-based composition
+(focus control, measurement, portal anchoring). Removing `forwardRef` breaks Ark UI integration.
 
-### コンポーネント配置戦略
-- ページ固有のコードは、ルートグループ配下の `_sections/` と `_components/` に配置
-- 真に再利用可能なUIプリミティブのみ `src/components/ui/arc/` に配置
-- 閾値: 2ページ以上で使われるコンポーネントのみ昇格。早すぎる抽象化を防ぐ
+### Component Placement Strategy
+- Page-specific code goes in `_sections/` and `_components/` under route groups
+- Only truly reusable UI primitives go in `src/components/ui/arc/`
+- Threshold: promote only when used on 2+ pages. Prevents premature abstraction
 
-### Park UI Neutral テーマ
-accentとgrayの両方に `neutral` を意図的に使用し、モノクロームのベースを実現。カラーアクセントはpreset層ではなく、機能ごとのrecipeバリアントオーバーライドで追加する。
+### Park UI Neutral Theme
+Both accent and gray intentionally use `neutral` for a monochrome base. Color accents
+are added per-feature via recipe variant overrides, not at the preset level.
 
-## 過去の教訓
+## Lessons Learned
 
-- 新しいPark UIコンポーネント追加後、recipeをインポートする前に **必ず `pnpm prepare` を実行すること**。codegen実行まで `styled-system/recipes/` にrecipeファイルは存在しない
-- `globals.css` は `@layer reset, base, tokens, recipes, utilities;` の順序で宣言すること。レイヤー順序を変更するとrecipeの詳細度が壊れる
-- Biomeの `organizeImports` アシストがインポートを自動並替えする。手動でのインポート順序調整と戦わないこと
-- `styled-system/` のインポートパスはコンポーネントから相対パス（例: `../../../../../styled-system/recipes`）。`@/*` エイリアスは `./src/*` にマップされており、プロジェクトルートの `styled-system/` には適用されない
+- After adding a new Park UI component, **always run `pnpm prepare`** before importing its recipe. The recipe file won't exist in `styled-system/recipes/` until codegen runs
+- `globals.css` must declare `@layer reset, base, tokens, recipes, utilities;` in exactly that order. Changing the layer order breaks recipe specificity
+- Biome's `organizeImports` assist reorders imports automatically. Do not fight it with manual import ordering
+- `styled-system/` import paths are relative from components (e.g., `../../../../../styled-system/recipes`). The `@/*` alias maps to `./src/*` and does not cover project-root `styled-system/`
 
-## 規約
+## Conventions
 
-- ユーザー向けテキストは日本語（layoutで `lang="ja"` 設定済み）
-- コミットメッセージは英語、命令形（git log参照）
-- Next.jsのpage/layout以外はdefault exportを使わない（named exportのみ）
-- `"use client"` の使用は最小限に — Server Componentsを優先
+- User-facing text in Japanese (`lang="ja"` set in layout)
+- Commit messages in English, imperative mood (see git log)
+- No default exports except Next.js pages/layouts (framework requirement)
+- Minimize `"use client"` — prefer Server Components

@@ -1,63 +1,46 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Design Intent
 
-## Commands
+This project builds UI with a "headless + recipe + preset" three-layer approach:
+- **Ark UI** — Headless behavior (accessibility, keyboard navigation, state management)
+- **PandaCSS recipes** — Visual styling as type-safe variant maps
+- **Park UI preset** — Default recipe implementations
 
-```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm lint         # Biome check (lint + format check)
-pnpm format       # Biome format (auto-fix)
-pnpm prepare      # PandaCSS codegen + lefthook install (run after token/recipe changes)
-```
+Park UI recipes are wrapped in `src/components/ui/arc/` rather than used directly.
+This provides a seam for project-specific variant overrides and anatomy extensions
+without modifying generated code. `styled-system/` is generated output — never hand-edit.
 
-Pre-commit hooks (via Lefthook) run `biome check` and `tsc --noEmit` in parallel.
+## Key Design Decisions
 
-## Stack
+### Why PandaCSS
+Build-time type-safe token enforcement. The `css()` utility and recipe system prevent
+arbitrary values, ensuring design consistency. Trade-off: `pnpm prepare` must be run
+after any token or recipe config change.
 
-- **Next.js 16** (App Router) + **React 19** + **TypeScript 6**
-- **PandaCSS** for styling — all styles via `css()` utility or recipes, no inline styles or hardcoded values
-- **Ark UI** for headless interactive components
-- **Park UI** panda-preset for pre-built component recipes (button, dialog, tabs, etc.)
-- **Biome** for linting/formatting (tab indent, double quotes)
+### Why forwardRef Is Required
+All UI components use `forwardRef`. Ark UI headless components use ref-based composition
+(focus control, measurement, portal anchoring). Removing `forwardRef` breaks Ark UI integration.
 
-## Styling Rules
+### Component Placement Strategy
+- Page-specific code goes in `_sections/` and `_components/` under route groups
+- Only truly reusable UI primitives go in `src/components/ui/arc/`
+- Threshold: promote only when used on 2+ pages. Prevents premature abstraction
 
-- Use PandaCSS tokens only: `css({ bg: "bg.default", p: "4" })` — never `style={{}}` or raw hex values
-- `styled-system/` is generated (gitignored) — run `pnpm prepare` after changing `panda.config.ts` or tokens
-- Import from relative paths to `styled-system/`: `import { css } from "../../styled-system/css"`
-- Path alias `@/*` maps to `./src/*`
+### Park UI Neutral Theme
+Both accent and gray intentionally use `neutral` for a monochrome base. Color accents
+are added per-feature via recipe variant overrides, not at the preset level.
 
-## Component Pattern
+## Lessons Learned
 
-UI components in `src/components/ui/arc/` **must** follow this structure:
+- After adding a new Park UI component, **always run `pnpm prepare`** before importing its recipe. The recipe file won't exist in `styled-system/recipes/` until codegen runs
+- `globals.css` must declare `@layer reset, base, tokens, recipes, utilities;` in exactly that order. Changing the layer order breaks recipe specificity
+- Biome's `organizeImports` assist reorders imports automatically. Do not fight it with manual import ordering
+- `styled-system/` import paths are relative from components (e.g., `../../../../../styled-system/recipes`). The `@/*` alias maps to `./src/*` and does not cover project-root `styled-system/`
 
-```
-button/
-├── button-anatomy.ts    # createAnatomy() slot definitions
-├── button-recipe.ts     # Recipe import from styled-system + type exports
-├── button.tsx           # Component — NO inline css() calls, use recipe only
-└── index.ts             # Barrel exports
-```
+## Conventions
 
-- Use `sva()` for multi-slot components, single recipe for simple ones
-- Call recipe once, apply via `className`
-- Re-export Park UI generated recipes from `styled-system/recipes` in the recipe file
-
-## Page Structure
-
-Pages use route groups with private folders for co-located code:
-
-```
-src/app/(top)/
-├── page.tsx              # Composes sections
-├── _sections/            # Page-level layout sections
-│   └── hero-section.tsx
-└── _components/          # Page-specific components
-    └── button-showcase.tsx
-```
-
-- `_sections/` = layout composition units for the page
-- `_components/` = small parts used within sections
-- Shared UI lives in `src/components/ui/arc/`
+- User-facing text in Japanese (`lang="ja"` set in layout)
+- Commit messages in English, imperative mood (see git log)
+- No default exports except Next.js pages/layouts (framework requirement)
+- Minimize `"use client"` — prefer Server Components

@@ -1,63 +1,41 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## 設計意図
 
-## Commands
+このプロジェクトは「headless + recipe + preset」の3層アプローチでUIを構築する:
+- **Ark UI** — ヘッドレスな振る舞い（アクセシビリティ、キーボード操作、状態管理）を提供
+- **PandaCSS recipes** — 型安全なバリアントマップとしてビジュアルスタイリングを定義
+- **Park UI preset** — デフォルトのrecipe実装を供給
 
-```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm lint         # Biome check (lint + format check)
-pnpm format       # Biome format (auto-fix)
-pnpm prepare      # PandaCSS codegen + lefthook install (run after token/recipe changes)
-```
+Park UIのrecipeを直接使わず `src/components/ui/arc/` でラップしている理由:
+プロジェクト固有のバリアントオーバーライドやanatomy拡張を、生成コードを変更せずに行うための継ぎ目が必要。`styled-system/` は生成出力であり、手動編集は禁止。
 
-Pre-commit hooks (via Lefthook) run `biome check` and `tsc --noEmit` in parallel.
+## 重要な設計判断
 
-## Stack
+### なぜ PandaCSS か
+ビルド時の型安全トークン強制が目的。`css()` ユーティリティとrecipeシステムにより任意の値を防ぎ、デザインの一貫性を保証する。トレードオフとして、トークンやrecipe設定の変更後は `pnpm prepare` による再生成が必須。
 
-- **Next.js 16** (App Router) + **React 19** + **TypeScript 6**
-- **PandaCSS** for styling — all styles via `css()` utility or recipes, no inline styles or hardcoded values
-- **Ark UI** for headless interactive components
-- **Park UI** panda-preset for pre-built component recipes (button, dialog, tabs, etc.)
-- **Biome** for linting/formatting (tab indent, double quotes)
+### なぜ forwardRef が必須か
+すべてのUIコンポーネントは `forwardRef` を使用する。Ark UIのヘッドレスコンポーネントはrefベースの合成パターン（フォーカス制御、寸法計測、ポータルアンカリング）を使用しており、`forwardRef` を削除するとArk UI統合が壊れる。
 
-## Styling Rules
+### コンポーネント配置戦略
+- ページ固有のコードは、ルートグループ配下の `_sections/` と `_components/` に配置
+- 真に再利用可能なUIプリミティブのみ `src/components/ui/arc/` に配置
+- 閾値: 2ページ以上で使われるコンポーネントのみ昇格。早すぎる抽象化を防ぐ
 
-- Use PandaCSS tokens only: `css({ bg: "bg.default", p: "4" })` — never `style={{}}` or raw hex values
-- `styled-system/` is generated (gitignored) — run `pnpm prepare` after changing `panda.config.ts` or tokens
-- Import from relative paths to `styled-system/`: `import { css } from "../../styled-system/css"`
-- Path alias `@/*` maps to `./src/*`
+### Park UI Neutral テーマ
+accentとgrayの両方に `neutral` を意図的に使用し、モノクロームのベースを実現。カラーアクセントはpreset層ではなく、機能ごとのrecipeバリアントオーバーライドで追加する。
 
-## Component Pattern
+## 過去の教訓
 
-UI components in `src/components/ui/arc/` **must** follow this structure:
+- 新しいPark UIコンポーネント追加後、recipeをインポートする前に **必ず `pnpm prepare` を実行すること**。codegen実行まで `styled-system/recipes/` にrecipeファイルは存在しない
+- `globals.css` は `@layer reset, base, tokens, recipes, utilities;` の順序で宣言すること。レイヤー順序を変更するとrecipeの詳細度が壊れる
+- Biomeの `organizeImports` アシストがインポートを自動並替えする。手動でのインポート順序調整と戦わないこと
+- `styled-system/` のインポートパスはコンポーネントから相対パス（例: `../../../../../styled-system/recipes`）。`@/*` エイリアスは `./src/*` にマップされており、プロジェクトルートの `styled-system/` には適用されない
 
-```
-button/
-├── button-anatomy.ts    # createAnatomy() slot definitions
-├── button-recipe.ts     # Recipe import from styled-system + type exports
-├── button.tsx           # Component — NO inline css() calls, use recipe only
-└── index.ts             # Barrel exports
-```
+## 規約
 
-- Use `sva()` for multi-slot components, single recipe for simple ones
-- Call recipe once, apply via `className`
-- Re-export Park UI generated recipes from `styled-system/recipes` in the recipe file
-
-## Page Structure
-
-Pages use route groups with private folders for co-located code:
-
-```
-src/app/(top)/
-├── page.tsx              # Composes sections
-├── _sections/            # Page-level layout sections
-│   └── hero-section.tsx
-└── _components/          # Page-specific components
-    └── button-showcase.tsx
-```
-
-- `_sections/` = layout composition units for the page
-- `_components/` = small parts used within sections
-- Shared UI lives in `src/components/ui/arc/`
+- ユーザー向けテキストは日本語（layoutで `lang="ja"` 設定済み）
+- コミットメッセージは英語、命令形（git log参照）
+- Next.jsのpage/layout以外はdefault exportを使わない（named exportのみ）
+- `"use client"` の使用は最小限に — Server Componentsを優先
